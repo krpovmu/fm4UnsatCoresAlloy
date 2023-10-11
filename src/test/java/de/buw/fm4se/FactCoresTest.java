@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 
-class AlloyCheckerCoreTest {
+class FactCoreTest {
 	private static A4Reporter rep;
 	private static A4Options opt;
 
