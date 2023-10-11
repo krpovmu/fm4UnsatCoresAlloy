@@ -94,7 +94,7 @@ public abstract class AbstractDdmin<T>  {
     for (int i = 0; (i * subSize) < numElem; i++) {
 
       ArrayList<T> part = new ArrayList<T>(elements.subList(i * subSize, Math.min((i + 1) * subSize, numElem)));
-      System.out.println("Checking: " + i * subSize + ":" + Math.min((i + 1) * subSize, numElem) + ", " + part.size() + " elements");
+      //System.out.println("Checking: " + i * subSize + ":" + Math.min((i + 1) * subSize, numElem) + ", " + part.size() + " elements");
       if (check(part, negSets)) {
         List<T> remainder = new ArrayList<>(elements);
         remainder.removeAll(part);
@@ -109,8 +109,7 @@ public abstract class AbstractDdmin<T>  {
 
         ArrayList<T> part = new ArrayList<T>(elements.subList(0, i * subSize));
         part.addAll(elements.subList(Math.min((i + 1) * subSize, numElem), numElem));
-        System.out.println("Checking: 0:" + i * subSize + " and " + Math.min((i + 1) * subSize, numElem) + ":" + numElem 
-                  + ", " + part.size() + " elements");
+        //System.out.println("Checking: 0:" + i * subSize + " and " + Math.min((i + 1) * subSize, numElem) + ":" + numElem + ", " + part.size() + " elements");
         if (check(part, negSets)) {
           List<T> remainder = new ArrayList<>(elements);
           remainder.removeAll(part);
@@ -148,7 +147,7 @@ public abstract class AbstractDdmin<T>  {
   	int setNum = 1; 
     for (List<T> supset : negSets) {
       if (supset.containsAll(part)) {
-      	System.out.println("check: return false - part is in neg set num " + setNum);
+      	//System.out.println("check: return false - part is in neg set num " + setNum);
         return false;
       }
       setNum++;
