@@ -28,146 +28,152 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
 OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 */
 
-
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractDdmin<T>  {
+public abstract class AbstractDdmin<T> {
 
 	static public boolean USE_NEGATIVE_SETS_LIST = true;
-  /**
-   * recursively minimize the set elements to a local minimum that still passes the check
-   * 
-   * requires monotonicity of check, i.e., supersets will give same result
-   * 
-   * @param elements
-   * @param n
-   * @return
-   * @throws AbstractGamesException
-   */
-  public List<T> minimize(List<T> elements) {
-    return ddminDo(elements, 2, new ArrayList<List<T>>());
-  }
 
-  public List<T> minimize(List<T> elements, List<List<T>> negSets) {
-    return ddminDo(elements, 2, negSets);
-  }
-  
-  /**
-   * recursively minimize the set elements to a local minimum that still passes the check
-   * 
-   * requires monotonicity of check, i.e., supersets will give same result
-   * 
-   * @param elements
-   * @param n
-   * @return
-   * @throws AbstractGamesException
-   */
-  private List<T> ddminDo(List<T> elements, int n, List<List<T>> negSets) {
-    List<T> min = ddmin(elements, n, negSets);
-    // if input size equals output size check property to be sure
-    if (min.size() == elements.size()) {
-      if (!check(min)) {
-        return new ArrayList<>();
-      }
-    }
-    return min;
-  }
+	/**
+	 * recursively minimize the set elements to a local minimum that still passes
+	 * the check
+	 * 
+	 * requires monotonicity of check, i.e., supersets will give same result
+	 * 
+	 * @param elements
+	 * @param n
+	 * @return
+	 * @throws AbstractGamesException
+	 */
+	public List<T> minimize(List<T> elements) {
+		return ddminDo(elements, 2, new ArrayList<List<T>>());
+	}
 
-  protected List<T> ddmin(List<T> elements, int n, List<List<T>> negSets) {
+	public List<T> minimize(List<T> elements, List<List<T>> negSets) {
+		return ddminDo(elements, 2, negSets);
+	}
 
-    int numElem = elements.size();
-    int subSize = numElem / n;
-    // sets need to be larger otherwise we miss some elements
-    if (subSize * n < numElem) {
-      subSize++;
-    }
+	/**
+	 * recursively minimize the set elements to a local minimum that still passes
+	 * the check
+	 * 
+	 * requires monotonicity of check, i.e., supersets will give same result
+	 * 
+	 * @param elements
+	 * @param n
+	 * @return
+	 * @throws AbstractGamesException
+	 */
+	private List<T> ddminDo(List<T> elements, int n, List<List<T>> negSets) {
+		List<T> min = ddmin(elements, n, negSets);
+		// if input size equals output size check property to be sure
+		if (min.size() == elements.size()) {
+			if (!check(min)) {
+				return new ArrayList<>();
+			}
+		}
+		return min;
+	}
 
-    if (numElem == 1 || n < 2) {
-      if (numElem == 1 && check(new ArrayList<T>())) {
-        return new ArrayList<T>();
-      }
-      return elements;
-    }
+	protected List<T> ddmin(List<T> elements, int n, List<List<T>> negSets) {
 
-    // First Case: If there exists a part that in unrealizable, recursively continue with that part
-    for (int i = 0; (i * subSize) < numElem; i++) {
+		int numElem = elements.size();
+		int subSize = numElem / n;
+		// sets need to be larger otherwise we miss some elements
+		if (subSize * n < numElem) {
+			subSize++;
+		}
 
-      ArrayList<T> part = new ArrayList<T>(elements.subList(i * subSize, Math.min((i + 1) * subSize, numElem)));
-      //System.out.println("Checking: " + i * subSize + ":" + Math.min((i + 1) * subSize, numElem) + ", " + part.size() + " elements");
-      if (check(part, negSets)) {
-        List<T> remainder = new ArrayList<>(elements);
-        remainder.removeAll(part);
-        dispose(remainder);
-        return ddmin(part, 2, negSets);
-      }
-    }
+		if (numElem == 1 || n < 2) {
+			if (numElem == 1 && check(new ArrayList<T>())) {
+				return new ArrayList<T>();
+			}
+			return elements;
+		}
 
-    // Second Case: check complements of parts
-    if (n != 2) {
-      for (int i = 0; (i * subSize) < numElem; i++) {
+		// First Case: If there exists a part that in unrealizable, recursively continue
+		// with that part
+		for (int i = 0; (i * subSize) < numElem; i++) {
 
-        ArrayList<T> part = new ArrayList<T>(elements.subList(0, i * subSize));
-        part.addAll(elements.subList(Math.min((i + 1) * subSize, numElem), numElem));
-        //System.out.println("Checking: 0:" + i * subSize + " and " + Math.min((i + 1) * subSize, numElem) + ":" + numElem + ", " + part.size() + " elements");
-        if (check(part, negSets)) {
-          List<T> remainder = new ArrayList<>(elements);
-          remainder.removeAll(part);
-          dispose(remainder);
-          return ddmin(part, n - 1, negSets);
-        }
-      }
-    }
+			ArrayList<T> part = new ArrayList<T>(elements.subList(i * subSize, Math.min((i + 1) * subSize, numElem)));
+			// System.out.println("Checking: " + i * subSize + ":" + Math.min((i + 1) *
+			// subSize, numElem) + ", " + part.size() + " elements");
+			if (check(part, negSets)) {
+				List<T> remainder = new ArrayList<>(elements);
+				remainder.removeAll(part);
+				dispose(remainder);
+				return ddmin(part, 2, negSets);
+			}
+		}
 
-    // Third Case: increase granularity and check for smaller subsets
-    if (n < elements.size()) {
-      return ddmin(elements, Math.min(numElem, 2 * n), negSets);
-    }
+		// Second Case: check complements of parts
+		if (n != 2) {
+			for (int i = 0; (i * subSize) < numElem; i++) {
 
-    return elements;
-  }
+				ArrayList<T> part = new ArrayList<T>(elements.subList(0, i * subSize));
+				part.addAll(elements.subList(Math.min((i + 1) * subSize, numElem), numElem));
+				// System.out.println("Checking: 0:" + i * subSize + " and " + Math.min((i + 1)
+				// * subSize, numElem) + ":" + numElem + ", " + part.size() + " elements");
+				if (check(part, negSets)) {
+					List<T> remainder = new ArrayList<>(elements);
+					remainder.removeAll(part);
+					dispose(remainder);
+					return ddmin(part, n - 1, negSets);
+				}
+			}
+		}
 
-  /**
-   * elements that will not be part of the core
-   * @param elements
-   */
-  protected void dispose(List<T> elements) {
-  }
+		// Third Case: increase granularity and check for smaller subsets
+		if (n < elements.size()) {
+			return ddmin(elements, Math.min(numElem, 2 * n), negSets);
+		}
 
-  /**
-   * check that tries to find a positively checked subset of part in checkedSets
-   * 
-   * @param part
-   * @param posSets
-   *          list of sets that satisfy criterion
-   * @return true if part or any of its subsets satisfies the criterion
-   */
-  protected boolean check(List<T> part, List<List<T>> negSets) {
+		return elements;
+	}
 
-  	int setNum = 1; 
-    for (List<T> supset : negSets) {
-      if (supset.containsAll(part)) {
-      	//System.out.println("check: return false - part is in neg set num " + setNum);
-        return false;
-      }
-      setNum++;
-    }
+	/**
+	 * elements that will not be part of the core
+	 * 
+	 * @param elements
+	 */
+	protected void dispose(List<T> elements) {
+	}
 
-    if (check(part)) {
-      return true;
-    }
+	/**
+	 * check that tries to find a positively checked subset of part in checkedSets
+	 * 
+	 * @param part
+	 * @param posSets list of sets that satisfy criterion
+	 * @return true if part or any of its subsets satisfies the criterion
+	 */
+	protected boolean check(List<T> part, List<List<T>> negSets) {
 
-    if (USE_NEGATIVE_SETS_LIST)
-    	negSets.add(part);
-    
-    return false;
-  }
+		int setNum = 1;
+		for (List<T> supset : negSets) {
+			if (supset.containsAll(part)) {
+				// System.out.println("check: return false - part is in neg set num " + setNum);
+				return false;
+			}
+			setNum++;
+		}
 
-  	  /**
-	   * check if part satisfies criterion, e.g., unsatisfiabiliy when looking for unsat core
-	   * 
-	   * @param part
-	   * @return true if part satisfies criterion
-	   */
+		if (check(part)) {
+			return true;
+		}
+
+		if (USE_NEGATIVE_SETS_LIST)
+			negSets.add(part);
+
+		return false;
+	}
+
+	/**
+	 * check if part satisfies criterion, e.g., unsatisfiabiliy when looking for
+	 * unsat core
+	 * 
+	 * @param part
+	 * @return true if part satisfies criterion
+	 */
 	protected abstract boolean check(List<T> part);
 }

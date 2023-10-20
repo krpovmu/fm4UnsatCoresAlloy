@@ -12,7 +12,7 @@ import edu.mit.csail.sdg.translator.A4Options;
 import edu.mit.csail.sdg.translator.A4Solution;
 import edu.mit.csail.sdg.translator.TranslateAlloyToKodkod;
 
-public class FactCores extends AbstractDdmin<Expr>{
+public class FactCores extends AbstractDdmin<Expr> {
 
 	private Command c;
 	private Module m;
@@ -22,14 +22,13 @@ public class FactCores extends AbstractDdmin<Expr>{
 
 	private Expr predicate;
 
-
 	/**
 	 * Check if the given Alloy module with the current subset of facts is unsat.
 	 */
 	@Override
-	protected boolean check(List<Expr> part) {		
+	protected boolean check(List<Expr> part) {
 		Command cmd = c.change(assemble(part));
-		A4Solution ans = TranslateAlloyToKodkod.execute_command(rep, m.getAllReachableSigs(), cmd, opt);		
+		A4Solution ans = TranslateAlloyToKodkod.execute_command(rep, m.getAllReachableSigs(), cmd, opt);
 		return !ans.satisfiable();
 	}
 
@@ -39,7 +38,7 @@ public class FactCores extends AbstractDdmin<Expr>{
 	 * @param part
 	 * @return
 	 */
-    private Expr assemble(List<Expr> part) {
+	private Expr assemble(List<Expr> part) {
 		List<Expr> cand = new java.util.ArrayList<Expr>(part);
 		cand.add(predicate);
 		ExprList el = ExprList.make(predicate.pos, predicate.span(), ExprList.Op.AND, cand);
@@ -47,7 +46,8 @@ public class FactCores extends AbstractDdmin<Expr>{
 	}
 
 	/**
-	 * Given an Alloy module with an unsat command (only checks the first command) find a minimal subset of the facts to be still unsat.
+	 * Given an Alloy module with an unsat command (only checks the first command)
+	 * find a minimal subset of the facts to be still unsat.
 	 * 
 	 * @param fileName
 	 * @param opt
@@ -68,13 +68,12 @@ public class FactCores extends AbstractDdmin<Expr>{
 		if (numFacts == el.args.size()) {
 			this.predicate = ExprConstant.TRUE;
 			part = el.args;
-		} else{
-			this.predicate = el.args.get(el.args.size()-1);
-			part = el.args.subList(0, el.args.size()-1);
+		} else {
+			this.predicate = el.args.get(el.args.size() - 1);
+			part = el.args.subList(0, el.args.size() - 1);
 		}
-
 		return minimize(part);
-    }
+	}
 
 	/**
 	 * Print the core line numbers and expressions.
@@ -90,6 +89,5 @@ public class FactCores extends AbstractDdmin<Expr>{
 		}
 		return result;
 	}
-
 
 }

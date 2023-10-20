@@ -12,11 +12,10 @@ import edu.mit.csail.sdg.translator.A4Options;
 import edu.mit.csail.sdg.translator.A4Solution;
 import edu.mit.csail.sdg.translator.TranslateAlloyToKodkod;
 
-public class LineCores extends AbstractDdmin<String>{
+public class LineCores extends AbstractDdmin<String> {
 
 	private A4Options opt;
 	private A4Reporter rep;
-
 
 	/**
 	 * Check if the given Alloy module with the current subset of facts is unsat.
@@ -30,13 +29,15 @@ public class LineCores extends AbstractDdmin<String>{
 			return !ans.satisfiable();
 		} catch (Exception e) {
 			// inconclusive, treat as sat
-			// TODO this means that we will overlook some cores that are subsets of this part
+			// TODO this means that we will overlook some cores that are subsets of this
+			// part
 			return false;
 		}
 	}
 
 	/**
-	 * Given an Alloy module with an unsat command (only checks the first command) find a minimal subset of the facts to be still unsat.
+	 * Given an Alloy module with an unsat command (only checks the first command)
+	 * find a minimal subset of the facts to be still unsat.
 	 * 
 	 * @param fileName
 	 * @param opt
@@ -49,10 +50,10 @@ public class LineCores extends AbstractDdmin<String>{
 		this.rep = rep;
 
 		List<String> part;
-		
+
 		part = Files.readAllLines(Paths.get(fileName));
 		return minimize(part);
-    }
+	}
 
 	/**
 	 * Print the core line numbers and expressions.
@@ -63,6 +64,5 @@ public class LineCores extends AbstractDdmin<String>{
 	public String printCore(List<String> core) {
 		return String.join("\n", core);
 	}
-
 
 }
