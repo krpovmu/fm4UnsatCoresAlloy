@@ -1,6 +1,7 @@
 package de.buw.fm4se;
 
 import java.util.List;
+
 import edu.mit.csail.sdg.alloy4.A4Reporter;
 import edu.mit.csail.sdg.ast.Command;
 import edu.mit.csail.sdg.ast.Expr;
@@ -89,5 +90,4 @@ public class FactCores extends AbstractDdmin<Expr> {
 		}
 		return result;
 	}
-
 }

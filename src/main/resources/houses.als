@@ -16,19 +16,19 @@ enum Color {
 }
 
 fact {
-    // all majors are in/linked by some house
+
     Major in House.major
-    // all colors are on/used by some house
+
     Color in House.color
     
-    H2.major = Phil    
+    H2.major = Phil
 
-    // The philosophy major lives directly to the right of the red house.
-    (H1.color = Red and H2.major = Phil) or ((H2.color = Red and H3.major = Phil))
-    //The computer science major lives in the blue house.
+    ((H1.color = Red and H2.major = Phil) or (H2.color = Red and H3.major = Phil))
+
     some h : House | h.color = Blue and h.major = CS
-    //The math major lives in house 2.
-    H2.major = Math    
+
+    H2.major = Math
+
 }
 
-run {} 
+run {}

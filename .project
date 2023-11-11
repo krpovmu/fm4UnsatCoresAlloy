@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>fm4se-alloy-sigs-checker</name>
-	<comment>Project fm4se-alloy-sigs-checker created by Buildship.</comment>
+	<name>fm4UnsatCoresAlloy</name>
+	<comment>Project fm4UnsatCoresAlloy created by Buildship.</comment>
 	<projects>
 	</projects>
 	<buildSpec>
