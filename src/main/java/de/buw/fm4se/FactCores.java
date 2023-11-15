@@ -59,6 +59,8 @@ public class FactCores extends AbstractDdmin<Expr> {
 		this.opt = opt;
 		this.rep = rep;
 		this.m = CompUtil.parseEverything_fromFile(rep, null, fileName);
+		
+		// If you always get the first fact why do you validate size 
 		this.c = m.getAllCommands().get(0);
 
 		ExprList el = (ExprList) c.formula;

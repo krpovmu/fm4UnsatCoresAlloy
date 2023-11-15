@@ -1,9 +1,19 @@
 package de.buw.fm4se;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class AbstractDdminMUS<T> {
+import edu.mit.csail.sdg.alloy4.A4Reporter;
+import edu.mit.csail.sdg.ast.Command;
+import edu.mit.csail.sdg.ast.Expr;
+import edu.mit.csail.sdg.ast.ExprList;
+import edu.mit.csail.sdg.ast.Module;
+import edu.mit.csail.sdg.translator.A4Options;
+import edu.mit.csail.sdg.translator.A4Solution;
+import edu.mit.csail.sdg.translator.TranslateAlloyToKodkod;
+
+public abstract class AbstractDdminMUS<T, E> {
 
 	/**
 	 * @param <E>
@@ -11,7 +21,8 @@ public abstract class AbstractDdminMUS<T> {
 	 * @param tvalue
 	 * @return
 	 */
-	public static <E> List<E> ddmin(List<E> input, TruthValueTest<E> tvalue) {
+	public static <E> List<E> ddmin(List<E> input, TruthValueTest<E> tvalue, Module module, Command command,
+			A4Reporter reporter, A4Options opt) {
 		int n = 2;
 		while (input.size() >= 2) {
 			// Reduce the subsets -- 1
@@ -20,7 +31,8 @@ public abstract class AbstractDdminMUS<T> {
 			for (List<E> subset : subsets) {
 				// reduce o complement -- 2
 				List<E> complement = difference(input, subset);
-				if (tvalue.run(complement) == TruthValueTest.FAIL) {
+				// here I have to assemble the model with the new complement
+				if (tvalue.check((List<Expr>) complement, module, command, reporter, opt) == TruthValueTest.FAIL) {
 					input = complement;
 					n = Math.max(n - 1, 2);
 					complementFailing = true;
@@ -57,7 +69,8 @@ public abstract class AbstractDdminMUS<T> {
 	}
 
 	/**
-	 *  This method calculate the complement
+	 * This method calculate the complement
+	 * 
 	 * @param <E>
 	 * @param a
 	 * @param b
@@ -71,11 +84,38 @@ public abstract class AbstractDdminMUS<T> {
 	}
 
 	/**
-	 * check if part satisfies criterion, e.g., unsatisfiabiliy when looking for
-	 * unsat core
+	 * create a conjunction from candidate facts and the predicate of the command
 	 * 
 	 * @param part
-	 * @return true if part satisfies criterion
+	 * @return
 	 */
-	protected abstract boolean check(List<T> part);
+	private static Expr assemble(List<Expr> part) {
+		List<Expr> cand = new ArrayList<Expr>(part);
+//		cand.add(predicate);
+//		ExprList el = ExprList.make(predicate.pos, predicate.span(), ExprList.Op.AND, cand);
+		ExprList el = ExprList.make(null, null, ExprList.Op.AND, cand);
+		return el;
+	}
+
+	private static TruthValueTest<Integer> harness = new TruthValueTest<Integer>() {
+		@Override
+		public int check(List<Expr> part, Module module, Command command, A4Reporter reporter, A4Options options) {
+			Command cmd;
+			int result = FAIL;
+			cmd = command.change(assemble(part));
+			A4Solution ans = TranslateAlloyToKodkod.execute_command(reporter, module.getAllReachableSigs(), cmd,
+					options);
+			if (ans.satisfiable()) {
+				result = PASS;
+			}
+			return result;
+		}
+
+	};
+
+//	protected boolean check(List<Expr> part, Module module, Command command, A4Reporter reporter, A4Options options) {
+//		Command cmd = command.change(assemble(part));
+//		A4Solution ans = TranslateAlloyToKodkod.execute_command(reporter, module.getAllReachableSigs(), cmd, options);
+//		return !ans.satisfiable();
+//	}
 }
