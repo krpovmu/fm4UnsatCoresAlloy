@@ -15,15 +15,13 @@ import edu.mit.csail.sdg.translator.TranslateAlloyToKodkod;
 
 public abstract class AbstractDdminMUS<T, E> {
 
-	/**
-	 * @param <E>
-	 * @param input
-	 * @param tvalue
-	 * @return
-	 */
-	public static <E> List<E> ddmin(List<E> input, TruthValueTest<E> tvalue, Module module, Command command,
-			A4Reporter reporter, A4Options opt) {
+	public static final int PASS = 1;
+	public static final int UNRESOLVED = 0;
+	public static final int FAIL = -1;
+
+	public static <E> List<E> ddmin(List<E> input, Module module, Command command, A4Reporter reporter, A4Options opt) {
 		int n = 2;
+//		TruthValueTest<E> tvalue = null;
 		while (input.size() >= 2) {
 			// Reduce the subsets -- 1
 			List<List<E>> subsets = split(input, n);
@@ -31,8 +29,8 @@ public abstract class AbstractDdminMUS<T, E> {
 			for (List<E> subset : subsets) {
 				// reduce o complement -- 2
 				List<E> complement = difference(input, subset);
-				// here I have to assemble the model with the new complement
-				if (tvalue.check((List<Expr>) complement, module, command, reporter, opt) == TruthValueTest.FAIL) {
+				// --- here I have to assemble the model with the new complement
+				if (check((List<Expr>) complement, module, command, reporter, opt) == TruthValueTest.FAIL) {
 					input = complement;
 					n = Math.max(n - 1, 2);
 					complementFailing = true;
@@ -97,21 +95,20 @@ public abstract class AbstractDdminMUS<T, E> {
 		return el;
 	}
 
-	private static TruthValueTest<Integer> harness = new TruthValueTest<Integer>() {
-		@Override
-		public int check(List<Expr> part, Module module, Command command, A4Reporter reporter, A4Options options) {
-			Command cmd;
-			int result = FAIL;
-			cmd = command.change(assemble(part));
-			A4Solution ans = TranslateAlloyToKodkod.execute_command(reporter, module.getAllReachableSigs(), cmd,
-					options);
-			if (ans.satisfiable()) {
-				result = PASS;
-			}
-			return result;
+//	private static TruthValueTest<Integer> harness = new TruthValueTest<Integer>() {
+//		@Override
+	public static int check(List<Expr> part, Module module, Command command, A4Reporter reporter, A4Options options) {
+		Command cmd;
+		int result = FAIL;
+		cmd = command.change(assemble(part));
+		A4Solution ans = TranslateAlloyToKodkod.execute_command(reporter, module.getAllReachableSigs(), cmd, options);
+		if (ans.satisfiable()) {
+			result = PASS;
 		}
+		return result;
+	}
 
-	};
+//	};
 
 //	protected boolean check(List<Expr> part, Module module, Command command, A4Reporter reporter, A4Options options) {
 //		Command cmd = command.change(assemble(part));
