@@ -24,15 +24,15 @@ public class DDminAlloyFactCores {
 		String filename = "/home/shuma/Documents/Bauhaus/02-Formal-Methods/08-NewFinalProject/FinalProject/fm4UnsatCoresAlloy/src/main/resources/houses.als";
 		A4Options options = new A4Options();
 		A4Reporter reporter = new A4Reporter();
-		
+
 //		List<Expr> core = fc.findCore(filename, options, reporter);
 //		System.out.println(fc.printCore(core));
 
 		List<Expr> MUSCores = fcm.findMUS(filename, options, reporter);
-		
+
 		for (Expr expr : MUSCores) {
 			System.out.println(expr);
 		}
-		
+
 	}
 }
