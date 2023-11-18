@@ -13,36 +13,56 @@ import edu.mit.csail.sdg.translator.A4Options;
 import edu.mit.csail.sdg.translator.A4Solution;
 import edu.mit.csail.sdg.translator.TranslateAlloyToKodkod;
 
+/**
+ * @param <T>
+ * @param <E>
+ */
 public abstract class AbstractDdminMUS<T, E> {
 
 	public static final int PASS = 1;
 	public static final int UNRESOLVED = 0;
 	public static final int FAIL = -1;
 
-	public static <E> List<E> ddmin(List<E> input, Module module, Command command, A4Reporter reporter, A4Options opt) {
+	/**
+	 * @param <E>
+	 * @param input
+	 * @param module
+	 * @param command
+	 * @param reporter
+	 * @param opt
+	 * @param printOption
+	 * @return
+	 */
+	public static <E> List<E> ddmin(List<E> input, Module module, Command command, A4Reporter reporter, A4Options opt,
+			int printOption) {
 		int n = 2;
-//		TruthValueTest<E> tvalue = null;
 		while (input.size() >= 2) {
-			// Reduce the subsets -- 1
+			// Reduce the subsets (1)
 			List<List<E>> subsets = split(input, n);
 			boolean complementFailing = false;
 			for (List<E> subset : subsets) {
-				// reduce o complement -- 2
 				List<E> complement = difference(input, subset);
-				// --- here I have to assemble the model with the new complement
-				if (check((List<Expr>) complement, module, command, reporter, opt) == TruthValueTest.FAIL) {
+				// Assemble the model with the complement I got from the last operation
+				int resultCheck = check((List<Expr>) complement, module, command, reporter, opt);
+				// this if is just for full print option is not related with ddmin algorithm
+				if (printOption == 1) {
+					String result = (resultCheck == 1) ? "PASSED" : "FAILED";
+					System.out.println(" EXPRESSION: " + complement + " RESULT: " + result);
+				}
+				if (resultCheck == FAIL) {
 					input = complement;
+					// Reduce to complement (2)
 					n = Math.max(n - 1, 2);
 					complementFailing = true;
 					break;
 				}
 			}
 			if (!complementFailing) {
-				// done -- 4
+				// Done (4)
 				if (n == input.size()) {
 					break;
 				}
-				// increase granularity -- 3
+				// Increase granularity (3)
 				n = Math.min(n * 2, input.size());
 			}
 		}
@@ -67,8 +87,6 @@ public abstract class AbstractDdminMUS<T, E> {
 	}
 
 	/**
-	 * This method calculate the complement
-	 * 
 	 * @param <E>
 	 * @param a
 	 * @param b
@@ -82,21 +100,23 @@ public abstract class AbstractDdminMUS<T, E> {
 	}
 
 	/**
-	 * create a conjunction from candidate facts and the predicate of the command
-	 * 
 	 * @param part
 	 * @return
 	 */
 	private static Expr assemble(List<Expr> part) {
 		List<Expr> cand = new ArrayList<Expr>(part);
-//		cand.add(predicate);
-//		ExprList el = ExprList.make(predicate.pos, predicate.span(), ExprList.Op.AND, cand);
 		ExprList el = ExprList.make(null, null, ExprList.Op.AND, cand);
 		return el;
 	}
 
-//	private static TruthValueTest<Integer> harness = new TruthValueTest<Integer>() {
-//		@Override
+	/**
+	 * @param part
+	 * @param module
+	 * @param command
+	 * @param reporter
+	 * @param options
+	 * @return
+	 */
 	public static int check(List<Expr> part, Module module, Command command, A4Reporter reporter, A4Options options) {
 		Command cmd;
 		int result = FAIL;
@@ -108,11 +128,16 @@ public abstract class AbstractDdminMUS<T, E> {
 		return result;
 	}
 
-//	};
-
-//	protected boolean check(List<Expr> part, Module module, Command command, A4Reporter reporter, A4Options options) {
-//		Command cmd = command.change(assemble(part));
-//		A4Solution ans = TranslateAlloyToKodkod.execute_command(reporter, module.getAllReachableSigs(), cmd, options);
-//		return !ans.satisfiable();
-//	}
+	/**
+	 * @param core
+	 * @return
+	 */
+	public String printCore(List<Expr> core) {
+		String result = "";
+		for (Expr e : core) {
+			result += e.pos.toShortString() + ": ";
+			result += e.toString() + "\n";
+		}
+		return result;
+	}
 }

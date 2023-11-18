@@ -21,6 +21,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
 	implementation files('lib/org.alloytools.alloy.dist.jar')
     implementation files('lib/slf4j-nop-1.6.6.jar')
+    implementation files('lib/argparse4j-0.9.0.jar')
 }
 
 application {
