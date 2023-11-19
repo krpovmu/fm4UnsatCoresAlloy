@@ -1,0 +1,96 @@
+/**
+ * First-order logic revision exercises based on a simple model of a 
+ * file system trash can.
+ * 
+ * The model has 3 unary predicates (sets), File, Trash and
+ * Protected, the latter two a sub-set of File. There is a binary 
+ * predicate, link, a sub-set of File x File.
+ *
+ * Solve the following exercises using only Alloy's first-order 
+ * logic:
+ *	- terms 't' are variables
+ *	- atomic formulas are either term comparisons 't1 = t2' and 
+ * 't1 != t2' or n-ary predicate tests 't1 -> ... -> tn in P' and 
+ * 't1 -> ... -> tn not in P'
+ *	- formulas are composed by 
+ *		- Boolean connectives 'not', 'and', 'or' and 'implies'
+ *		- quantifications 'all' and 'some' over unary predicates
+ **/
+
+/* The set of files in the file system. */
+sig File {
+  	/* A file is potentially a link to other files. */
+	link : set File
+}
+/* The set of files in the trash. */
+sig Trash in File {}
+/* The set of protected files. */
+sig Protected in File {}
+
+/* The trash is empty. */
+pred inv1 {
+	all f:File | f not in Trash
+}
+
+/* All files are deleted. */
+pred inv2 {
+	all f:File | f in Trash
+}
+
+/* Some file is deleted. */
+pred inv3 {
+	some f:File | f in Trash
+}
+
+/* Protected files cannot be deleted. */
+pred inv4 {
+	all f:Protected | f not in Trash
+}
+
+pred aux1 {
+  	all f:File | f in Protected implies f not in Trash
+}
+
+pred aux2 {
+  	all f:Protected | f not in Trash
+}
+
+check {aux1 iff aux2} for 10
+
+/* All unprotected files are deleted.. */
+pred inv5 {
+
+}
+
+/* A file links to at most one file. */
+pred inv6 {
+	all x,y,z : File | (x->y in link and x->z in link) implies y=z 
+}
+
+
+pred inv7 {
+	all f:File | isLinked[f] implies f not in Trash
+}
+
+pred isLinked[f:File] {  
+  some g:File | g->f in link
+}
+
+pred isLink[f:File] {  
+  some g:File | f->g in link
+}
+
+/* There are no links. */
+pred inv8 {
+	all f:File | not isLinked[f]
+}
+
+/* A link does not link to another link. */
+pred inv9 {
+	all f,g,h:File | f->g in link implies g->h not in link
+}
+
+/* If a link is deleted, so is the file it links to. */
+pred inv10 {
+
+}

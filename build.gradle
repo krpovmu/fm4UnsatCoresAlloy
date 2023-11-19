@@ -26,7 +26,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass = 'de.buw.fm4se.AlloyChecker'
+    mainClass = 'de.buw.ddminalloy.DDminAlloyFactCores'
 }
 
 run {
