@@ -57,9 +57,6 @@ pred inv6 {
 	all x,y,z : File | (x->y in link and x->z in link) implies z=y
 }
 
-
-
-
 /* There is no deleted link. */
 pred inv7 {
 	all f:File | isLink[f] implies f not in Trash
@@ -81,3 +78,5 @@ pred inv9 {
 pred inv10 {
 	all f:Trash,g:File | f->g in link implies g in Trash
 }
+
+run {}

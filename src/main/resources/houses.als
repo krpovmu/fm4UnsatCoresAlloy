@@ -31,4 +31,8 @@ fact {
 
 }
 
+//fact x {
+//  one Math
+//}
+
 run {}
