@@ -17,8 +17,8 @@ import edu.mit.csail.sdg.translator.A4Options;
 public class PredSigMUSCores<T, E> extends AbstractDdminMUS<T, E> {
 	public List<Expr> findMUS(String fileName, A4Options options, A4Reporter reporter, int printOption) {
 		List<Expr> listPredSigs = new ArrayList<Expr>();
-		String regex = "\\brun\\w*\\$";
-		Pattern pattern = Pattern.compile(regex);
+		String run_regex = "\\brun\\w*\\$";
+		Pattern pattern = Pattern.compile(run_regex);
 		CompModule module = CompUtil.parseEverything_fromFile(null, null, fileName);
 		try {
 			for (Sig predName : module.getAllSigs()) {
@@ -27,13 +27,10 @@ public class PredSigMUSCores<T, E> extends AbstractDdminMUS<T, E> {
 			for (Func predator : module.getAllFunc()) {
 				System.out.println(predator.label + " ->  " + predator.getBody());
 				Matcher match = pattern.matcher(predator.label);
-						
 				if (match.find()) {
-
+					System.out.println("It's a run command");
 				}
-
 			}
-
 		} catch (Err e) {
 			e.printStackTrace();
 		}
