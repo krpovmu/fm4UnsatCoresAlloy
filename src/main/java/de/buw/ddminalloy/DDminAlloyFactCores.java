@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import de.buw.fm4se.FactsMUSCores;
-import de.buw.fm4se.PredSigMUSCores;
+import de.buw.fm4se.ModelAnalyzerMUS;
 import edu.mit.csail.sdg.alloy4.A4Reporter;
 import edu.mit.csail.sdg.ast.Expr;
 import edu.mit.csail.sdg.translator.A4Options;
@@ -34,10 +34,13 @@ public class DDminAlloyFactCores {
 
 			for (File file : files) {
 				FactsMUSCores fcm = new FactsMUSCores();
-				PredSigMUSCores psc = new PredSigMUSCores();
+				ModelAnalyzerMUS psc = new ModelAnalyzerMUS();
 				A4Options options = new A4Options();
 				A4Reporter reporter = new A4Reporter();
-				List<Expr> MUSCores = psc.findMUS(file.getPath(), options, reporter, 0);
+				List<Object> MUSCores = psc.modelSeparator(file.getPath(), options, reporter, 0);
+//				List<Object> MUSCores = psc.findMUS(file.getPath(), options, reporter, 0);
+				
+				System.out.println(MUSCores);
 			}
 
 //			for (File file : files) {
