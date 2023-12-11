@@ -1,6 +1,7 @@
 package de.buw.ddminalloy;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import de.buw.fm4se.FactsMUSCores;
@@ -16,6 +17,14 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 public class DDminAlloyFactCores {
 
+	
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * @param args
 	 */
@@ -37,9 +46,9 @@ public class DDminAlloyFactCores {
 				ModelAnalyzerMUS psc = new ModelAnalyzerMUS();
 				A4Options options = new A4Options();
 				A4Reporter reporter = new A4Reporter();
-				List<Object> MUSCores = psc.modelSeparator(file.getPath(), options, reporter, 0);
+				LinkedHashMap<String, Object> MUSCores = psc.modelSeparator(file.getPath(), options, reporter, 0);
 //				List<Object> MUSCores = psc.findMUS(file.getPath(), options, reporter, 0);
-				
+
 				System.out.println(MUSCores);
 			}
 
