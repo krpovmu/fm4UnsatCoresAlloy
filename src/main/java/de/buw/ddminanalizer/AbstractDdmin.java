@@ -1,4 +1,4 @@
-package de.buw.fm4se;
+package de.buw.ddminanalizer;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -17,7 +17,7 @@ import edu.mit.csail.sdg.translator.TranslateAlloyToKodkod;
  * @param <T>
  * @param <E>
  */
-public abstract class AbstractDdminMUS<T, E> {
+public abstract class AbstractDdmin<T, E> {
 
 	public static final int PASS = 1;
 	public static final int UNRESOLVED = 0;
@@ -33,8 +33,8 @@ public abstract class AbstractDdminMUS<T, E> {
 	 * @param printOption
 	 * @return
 	 */
-	public static <E> List<E> ddmin(List<E> input, Module module, Command command, A4Reporter reporter, A4Options opt,
-			int printOption) {
+	public static <E> List<E> ddmin(List<E> input, Module module, Command command, A4Reporter reporter, A4Options opt, int printOption) 
+	{
 		int n = 2;
 		while (input.size() >= 2) {
 			// Reduce the subsets (1)

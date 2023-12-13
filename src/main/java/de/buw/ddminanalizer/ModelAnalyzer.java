@@ -1,27 +1,39 @@
-package de.buw.fm4se;
+package de.buw.ddminanalizer;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
-import edu.mit.csail.sdg.alloy4.A4Reporter;
 import edu.mit.csail.sdg.alloy4.Err;
 import edu.mit.csail.sdg.alloy4.SafeList;
+import edu.mit.csail.sdg.ast.Browsable;
 import edu.mit.csail.sdg.ast.Command;
 import edu.mit.csail.sdg.ast.Func;
 import edu.mit.csail.sdg.parser.CompModule;
 import edu.mit.csail.sdg.parser.CompUtil;
-import edu.mit.csail.sdg.translator.A4Options;
 
-public class ModelAnalyzerMUS<T, E> {
+public class ModelAnalyzer<E> {
 
-	public LinkedHashMap<String, Object> modelSeparator(String fileName, A4Options options, A4Reporter reporter,
-			int printOption) {
+	public <T> LinkedHashMap<String, Object> modelSeparator(String fileName) {
+
 		LinkedHashMap<String, Object> listSigPredFacts = new LinkedHashMap<String, Object>();
-
 		try {
 			CompModule module = CompUtil.parseEverything_fromFile(null, null, fileName);
 			Command command = module.getAllCommands().get(0);
 			listSigPredFacts.put("Sigs", module.getAllSigs());
-			listSigPredFacts.put("Facts", module.getAllFacts());
+			
+			for (int i = 0; i < module.getAllFacts().size(); i++) {
+				// System.out.println(module.getAllFacts().get(i).a);
+				// System.out.println(module.getAllFacts().get(i).b);
+				
+				String factName = "Fact" + i ; 
+				SafeList<T> listExprFact = new SafeList<T>();
+				List<? extends Browsable> exprFact = (module.getAllFacts().get(i).b).getSubnodes();
+
+				for (Browsable fact : exprFact) {
+					 listExprFact.add((T) fact);
+				}
+				listSigPredFacts.put(factName, listExprFact);
+			}
 
 			SafeList<Object> predicates = new SafeList<Object>();
 			SafeList<Object> Functions = new SafeList<Object>();
@@ -48,4 +60,5 @@ public class ModelAnalyzerMUS<T, E> {
 		}
 		return listSigPredFacts;
 	}
+
 }
