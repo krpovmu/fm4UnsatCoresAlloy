@@ -110,7 +110,7 @@ public abstract class AbstractDdmin<T, E> {
 				r.addAll(complement);
 			} else if (subsetResult == PASS && complementResult == PASS) {
 				newN = Math.min(c.size(), 2 * n);
-				//newN = Math.min(n * 2, c.size());
+				// newN = Math.min(n * 2, c.size());
 				break;
 			}
 		}
