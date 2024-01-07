@@ -16,6 +16,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 
 public class DDminAlloyCores {
 
+	@SuppressWarnings("unchecked")
 	public static <E> void main(String[] args) throws IOException, ArgumentParserException {
 		ArgumentParser parser = ArgumentParsers.newFor("FileLoader").build().description("Load and print file names from console");
 		parser.addArgument("-i", "--inputfiles").metavar("FILE").nargs("+").type(Arguments.fileType().verifyExists().verifyIsFile()).required(true).help("List of files to load");

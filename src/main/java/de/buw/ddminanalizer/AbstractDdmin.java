@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import edu.mit.csail.sdg.alloy4.A4Reporter;
 import edu.mit.csail.sdg.ast.Command;
@@ -31,19 +34,23 @@ public abstract class AbstractDdmin<T, E> {
 		if (typeCore.equals("Predicates")) {
 			predicatesList = list;
 		}
+
+		// get list with Ids
+		Map<Integer, E> listWithIds = giveNumericIdsToList(list);
+		TreeMap<Integer, E> sortedList = new TreeMap<>();
+		sortedList.putAll(listWithIds);
+		printNumericalOrderedList(sortedList);
+
 		while (list.size() >= 2) {
 			// Reduce the subsets (1)
 			List<List<E>> subsets = split(list, n);
 			boolean complementFailing = false;
-			List<E> passListToCompare = new ArrayList<E>();
+			// List<E> passListToCompare = new ArrayList<E>();
 			for (List<E> subset : subsets) {
 				List<E> complement = difference(list, subset);
 				int resultCheck = check(complement, module, command, reporter, opt, typeCore, pathModel, predicatesList);
 				if (printTrace) {
-					System.out.println(printTrace(complement, resultCheck));
-				}
-				if (resultCheck == PASS) {
-					passListToCompare = complement;
+					System.out.println(printTrace(complement, sortedList, resultCheck));
 				}
 				if (resultCheck == FAIL) {
 					list = complement;
@@ -51,12 +58,6 @@ public abstract class AbstractDdmin<T, E> {
 					n = Math.max(n - 1, 2);
 					complementFailing = true;
 					break;
-				}
-				if (resultCheck == UNRESOLVED) {
-					
-					
-					
-
 				}
 			}
 			if (!complementFailing) {
@@ -71,6 +72,54 @@ public abstract class AbstractDdmin<T, E> {
 		return list;
 	}
 
+	public List<E> ddMinPlus(List<E> input, Module module, Command command, A4Reporter reporter, A4Options opt, String typeCore, String pathModel, boolean printTrace, int n) throws IOException {
+
+		// get list with Ids
+		Map<Integer, E> listWithIds = giveNumericIdsToList(input);
+		TreeMap<Integer, E> sortedList = new TreeMap<>();
+		sortedList.putAll(listWithIds);
+		printNumericalOrderedList(sortedList);
+
+		if (input.size() == 1) {
+			return input;
+		}
+
+		List<E> predicatesList = new ArrayList<E>();
+		if (typeCore.equals("Predicates")) {
+			predicatesList = input;
+		}
+
+		// List<List<E>> subsets = split(input, n);
+		List<List<E>> subsets = partition(input, n);
+
+		List<E> r = new ArrayList<E>();
+		List<E> c = new ArrayList<E>(input);
+		int newN = n;
+
+		for (List<E> subset : subsets) {
+			List<E> complement = difference(input, subset);
+			int subsetResult = check(union(subset, r), module, command, reporter, opt, typeCore, pathModel, predicatesList);
+			int complementResult = check(union(complement, r), module, command, reporter, opt, typeCore, pathModel, predicatesList);
+			if (printTrace) {
+				System.out.println("Subset " + printTrace(subset, sortedList, subsetResult));
+				System.out.println("Complement " + printTrace(complement, sortedList, complementResult));
+			}
+			if (subsetResult == FAIL) {
+				return ddMinPlus(subset, module, command, reporter, opt, typeCore, pathModel, printTrace, 2);
+			} else if (subsetResult == UNRESOLVED && complementResult == PASS) {
+				r.addAll(complement);
+			} else if (subsetResult == PASS && complementResult == PASS) {
+				newN = Math.min(c.size(), 2 * n);
+//				newN = Math.min(n * 2, c.size());
+				break;
+			}
+		}
+		if (newN > n) {
+			return ddMinPlus(c, module, command, reporter, opt, typeCore, pathModel, printTrace, newN);
+		}
+		return r;
+	}
+
 	private static <E> List<List<E>> split(List<E> s, int n) {
 		List<List<E>> subsets = new LinkedList<List<E>>();
 		int position = 0;
@@ -82,7 +131,7 @@ public abstract class AbstractDdmin<T, E> {
 		return subsets;
 	}
 
-	private <E> List<E> difference(List<E> a, List<E> b) {
+	private List<E> difference(List<E> a, List<E> b) {
 		List<E> result = new LinkedList<E>();
 		result.addAll(a);
 		result.removeAll(b);
@@ -152,7 +201,64 @@ public abstract class AbstractDdmin<T, E> {
 		return isPredicateToDelete;
 	}
 
-	public String printTrace(List<E> core, int ddminResult) {
-		return "List : " + core + " Result: " + ((ddminResult == 1) ? "PASS" : (ddminResult == 0) ? "UNRESOLVED" : "FAIL");
+	public String printTrace(List<E> core, Map<Integer, E> origList, int ddminResult) {
+		List<Integer> coreId = elementsToID(core, origList);
+		return "List : " + coreId + " Result: " + ((ddminResult == 1) ? "PASS" : (ddminResult == 0) ? "UNRESOLVED" : "FAIL");
+	}
+
+	private List<List<E>> partition(List<E> set, int n) {
+		List<E> list = new ArrayList<>(set);
+		List<List<E>> subsets = new ArrayList<>();
+		// Calculate the size of each subset
+		int subsetSize = (set.size() + n - 1) / n; // Ensure all elements are covered
+		for (int i = 0; i < n; i++) {
+			List<E> subset = new ArrayList<>();
+			for (int j = i * subsetSize; j < (i + 1) * subsetSize && j < list.size(); j++) {
+				subset.add(list.get(j));
+			}
+			subsets.add(subset);
+		}
+		return subsets;
+	}
+
+	public List<E> union(List<E> set1, List<E> set2) {
+		List<E> union = new ArrayList<E>(set1);
+		union.addAll(set2);
+		return union;
+	}
+
+	public Map giveNumericIdsToList(List<E> elements) {
+		Map<Integer, E> elementIds = new HashMap<>();
+		int nextId = 1;
+		for (E element : elements) {
+			if (!elementIds.containsKey(element)) {
+				elementIds.put(nextId, element);
+				nextId++;
+			}
+		}
+		return elementIds;
+	}
+
+	public void printNumericalOrderedList(TreeMap<Integer, E> listWithIds) {
+		System.out.println("=======================");
+		System.out.println("ID: Element");
+		System.out.println("=======================");
+		for (Map.Entry<Integer, E> entry : listWithIds.entrySet()) {
+			System.out.println(entry.getKey() + " : " + entry.getValue());
+		}
+		System.out.println("=======================");
+	}
+
+	public List<Integer> elementsToID(List<E> complement, Map<Integer, E> idList) {
+		List<Integer> outIdList = new ArrayList<Integer>();
+		for (E compElem : complement) {
+			for (Map.Entry<Integer, E> entry : idList.entrySet()) {
+				if (compElem.equals(entry.getValue())) {
+					outIdList.add(entry.getKey());
+					break;
+				}
+			}
+		}
+		return outIdList;
 	}
 }
