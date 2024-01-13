@@ -72,6 +72,36 @@ public abstract class AbstractDdmin<T, E> {
 		return list;
 	}
 
+	public List<E> ddPlus(List<E> input, Module module, Command command, A4Reporter reporter, A4Options opt, String typeCore, String pathModel, boolean printTrace, int n) throws IOException {
+
+		List<E> listError = new ArrayList();
+
+		// get list with Ids
+		Map<Integer, E> listWithIds = giveNumericIdsToList(input);
+		TreeMap<Integer, E> sortedList = new TreeMap<>();
+		sortedList.putAll(listWithIds);
+		printNumericalOrderedList(sortedList);
+
+		if (input.size() == 1) {
+			return input;
+		}
+
+		List<E> predicatesList = new ArrayList<E>();
+		if (typeCore.equals("Predicates")) {
+			predicatesList = input;
+		}
+
+		List<List<E>> subsets = partition(input, n);
+
+		int newN = n;
+
+		for (List<E> subset : subsets) {
+
+		}
+
+		return listError;
+	}
+
 	public List<E> ddMinPlus(List<E> input, Module module, Command command, A4Reporter reporter, A4Options opt, String typeCore, String pathModel, boolean printTrace, int n) throws IOException {
 
 		// get list with Ids

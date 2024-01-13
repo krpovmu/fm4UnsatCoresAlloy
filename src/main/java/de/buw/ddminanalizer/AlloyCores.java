@@ -68,8 +68,8 @@ public class AlloyCores<E> extends AbstractDdmin<Object, Object> {
 				if (((List<E>) element.getValue()).size() == 0) {
 					System.out.println("Empty: " + element.getKey() + " List");
 				} else {
-//					musCores = (List<E>) ddmin((List<Object>) element.getValue(), module, command, rep, opt, element.getKey(), fileName, printTrace);
-					musCores = (List<E>) ddMinPlus((List<Object>) element.getValue(), module, command, rep, opt, element.getKey(), fileName, printTrace,2);
+					musCores = (List<E>) ddmin((List<Object>) element.getValue(), module, command, rep, opt, element.getKey(), fileName, printTrace);
+//					musCores = (List<E>) ddMinPlus((List<Object>) element.getValue(), module, command, rep, opt, element.getKey(), fileName, printTrace,2);
 				}
 				System.out.println("=============");
 				System.out.println("\n" + printCore(musCores));
